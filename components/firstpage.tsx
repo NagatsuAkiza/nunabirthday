@@ -188,7 +188,9 @@ const SceneSequence: React.FC = () => {
       }>
       <audio ref={audioRef} src="/music.mp3" />
       {scene === 0 ? (
-        <button onClick={startAudio} className="p-4 bg-blue-500 text-white rounded text-lg">
+        <button
+          onClick={startAudio}
+          className="p-4 bg-blue-500 py-4 px-7 text-white rounded-xl text-lg hover:bg-blue-600 transition-all hover:scale-105">
           Masuk
         </button>
       ) : (
