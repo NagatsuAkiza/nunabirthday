@@ -3,23 +3,26 @@
 import { useState, useEffect, useRef } from "react";
 
 const SceneSequence: React.FC = () => {
-  const [scene, setScene] = useState(1);
+  const [scene, setScene] = useState(0); // Start from 0 to show the start button first
   const [background, setBackground] = useState("bg-black");
   const [backgroundImage, setBackgroundImage] = useState<string | undefined>(undefined);
+  const [backgroundImageClass, setBackgroundImageClass] = useState(""); // New state for background image class
   const [opacity, setOpacity] = useState("opacity-100");
-  const [content, setContent] = useState<string | JSX.Element>("dimana ini?");
+  const [content, setContent] = useState<string | JSX.Element>("Dimana ini?");
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isAudioStarted, setIsAudioStarted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      goToNextScene();
-    }, 5000); // Transition to the next scene after 5 seconds
+    if (isAudioStarted) {
+      const timer = setTimeout(() => {
+        goToNextScene();
+      }, 5000); // Transition to the next scene after 5 seconds
 
-    return () => clearTimeout(timer);
-  }, [scene]);
+      return () => clearTimeout(timer);
+    }
+  }, [scene, isAudioStarted]);
 
   useEffect(() => {
-    // Fade in effect when scene changes
     setOpacity("opacity-0");
     const fadeInTimeout = setTimeout(() => {
       setOpacity("opacity-100");
@@ -27,6 +30,16 @@ const SceneSequence: React.FC = () => {
 
     return () => clearTimeout(fadeInTimeout);
   }, [scene]);
+
+  const startAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch((error) => {
+        console.error("Audio playback failed:", error);
+      });
+      setIsAudioStarted(true);
+      setScene(1); // Start the scene sequence after audio starts
+    }
+  };
 
   const goToNextScene = () => {
     setOpacity("opacity-0");
@@ -37,8 +50,8 @@ const SceneSequence: React.FC = () => {
           setScene(2);
           break;
         case 2:
-          if (audioRef.current) {
-            audioRef.current.play();
+          if (!isAudioStarted) {
+            startAudio();
           }
           setContent("");
           setScene(3);
@@ -51,6 +64,7 @@ const SceneSequence: React.FC = () => {
         case 4:
           setBackground("bg-white");
           setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg");
+          setBackgroundImageClass(""); // Reset class for background image
           setContent("");
           setScene(5);
           break;
@@ -62,7 +76,8 @@ const SceneSequence: React.FC = () => {
           break;
         case 6:
           setBackground("bg-black");
-          setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg"); // Update this to your background image path
+          setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg");
+          setBackgroundImageClass(""); // Reset class for background image
           setContent(
             <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
               <p className="absolute top-[80%] z-20 text-4xl text-white stroke-black">Haloo!!</p>
@@ -77,7 +92,8 @@ const SceneSequence: React.FC = () => {
           break;
         case 7:
           setBackground("bg-black");
-          setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg"); // Update this to your background image path
+          setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg");
+          setBackgroundImageClass(""); // Reset class for background image
           setContent(
             <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
               <p className="absolute top-[80%] z-20 text-4xl text-white stroke-black">
@@ -124,7 +140,8 @@ const SceneSequence: React.FC = () => {
           break;
         case 10:
           setBackground("bg-black");
-          setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg"); // Update this to your background image path
+          setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg");
+          setBackgroundImageClass("blur-sm"); // Add blur class here
           setContent(
             <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
               <div className="absolute inset-0 flex items-center justify-center">
@@ -144,7 +161,8 @@ const SceneSequence: React.FC = () => {
           break;
         case 11:
           setBackground("bg-black");
-          setBackgroundImage(undefined); // Ensure background image is cleared
+          setBackgroundImage(undefined);
+          setBackgroundImageClass(""); // Reset class for background image
           setContent("Sehat selalu yaa <3");
           setScene(12);
           break;
@@ -161,11 +179,21 @@ const SceneSequence: React.FC = () => {
       className={`fixed top-0 left-0 w-full h-full transition-opacity duration-1000 ${background} ${opacity} flex items-center justify-center text-white font-semibold`}
       style={
         backgroundImage
-          ? { backgroundImage: `url(${backgroundImage})`, backgroundSize: "cover" }
+          ? {
+              backgroundImage: `url(${backgroundImage})`,
+              backgroundSize: "cover",
+              filter: backgroundImageClass ? "blur(10px)" : "none" // Apply blur effect if class is set
+            }
           : {}
       }>
       <audio ref={audioRef} src="/music.mp3" />
-      <div className="text-center">{content}</div>
+      {scene === 0 ? (
+        <button onClick={startAudio} className="p-4 bg-blue-500 text-white rounded text-lg">
+          Masuk
+        </button>
+      ) : (
+        <div className="text-center">{content}</div>
+      )}
     </div>
   );
 };
