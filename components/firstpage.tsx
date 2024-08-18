@@ -141,7 +141,7 @@ const SceneSequence: React.FC = () => {
         case 10:
           setBackground("bg-black");
           setBackgroundImage("/25552d345fb3f92e86722f3b579aca94.jpg");
-          setBackgroundImageClass("blur-sm"); // Add blur class here
+          // setBackgroundImageClass("blur-sm"); // Add blur class here
           setContent(
             <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
               <div className="absolute inset-0 flex items-center justify-center">
